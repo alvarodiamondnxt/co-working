@@ -13,6 +13,15 @@ const sql = postgres(connectionString, {
   max: 10, // Maximum number of connections
   idle_timeout: 20, // Close idle connections after 20 seconds
   connect_timeout: 10, // Connection timeout
+  onnotice: () => {}, // Suppress notices
+  debug: (connection, query, parameters) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 DB Query:', query);
+      if (parameters && parameters.length > 0) {
+        console.log('   Parameters:', parameters);
+      }
+    }
+  },
 });
 
 export default sql;

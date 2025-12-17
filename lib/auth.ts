@@ -8,30 +8,51 @@ export async function generateVerificationCode(): Promise<string> {
 }
 
 export async function createUser(email: string, password: string, name: string) {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const userId = generateId();
-  
-  // Create user
-  const [user] = await sql`
-    INSERT INTO "User" (id, email, password, name, "createdAt", "updatedAt")
-    VALUES (${userId}, ${email}, ${hashedPassword}, ${name}, NOW(), NOW())
-    RETURNING id, email, name, "createdAt", "updatedAt"
-  `;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const userId = generateId();
+    
+    console.log('Creating user with ID:', userId);
+    
+    // Create user
+    const [user] = await sql`
+      INSERT INTO "User" (id, email, password, name, "createdAt", "updatedAt")
+      VALUES (${userId}, ${email}, ${hashedPassword}, ${name}, NOW(), NOW())
+      RETURNING id, email, name, "createdAt", "updatedAt"
+    `;
 
-  // Generate and send verification code
-  const code = await generateVerificationCode();
-  const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+    if (!user) {
+      throw new Error('Failed to create user - no user returned from INSERT');
+    }
 
-  const codeId = generateId();
-  await sql`
-    INSERT INTO "VerificationCode" (id, code, email, "userId", "expiresAt", used, "createdAt")
-    VALUES (${codeId}, ${code}, ${email}, ${userId}, ${expiresAt}, false, NOW())
-  `;
+    console.log('User created successfully:', user.id);
 
-  await sendVerificationCode(email, code);
+    // Generate and send verification code
+    const code = await generateVerificationCode();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 10);
 
-  return user;
+    const codeId = generateId();
+    await sql`
+      INSERT INTO "VerificationCode" (id, code, email, "userId", "expiresAt", used, "createdAt")
+      VALUES (${codeId}, ${code}, ${email}, ${userId}, ${expiresAt}, false, NOW())
+    `;
+
+    console.log('Verification code created for user:', userId);
+
+    await sendVerificationCode(email, code);
+
+    return user;
+  } catch (error: any) {
+    console.error('Error in createUser:', error);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+      hint: error.hint,
+    });
+    throw error;
+  }
 }
 
 export async function verifyCode(email: string, code: string) {

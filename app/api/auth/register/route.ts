@@ -28,12 +28,20 @@ export async function POST(request: NextRequest) {
 
     const user = await createUser(email, password, name);
 
+    if (!user || !user.id) {
+      console.error("User creation returned invalid user:", user);
+      return NextResponse.json(
+        { error: "Failed to create user - please try again" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       message: "Verification code sent to your email",
       userId: user.id,
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid data", details: error.errors },
@@ -41,8 +49,15 @@ export async function POST(request: NextRequest) {
       );
     }
     console.error("Registration error:", error);
+    console.error("Error stack:", error.stack);
+    
+    // Return more detailed error message
+    const errorMessage = error.message || "Error registering user";
     return NextResponse.json(
-      { error: "Error registering user" },
+      { 
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

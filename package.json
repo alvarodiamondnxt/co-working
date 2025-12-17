@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:db": "node --loader ts-node/esm lib/test-db.ts",
     "clean": "Remove-Item -Path .next -Recurse -Force -ErrorAction SilentlyContinue"
   },
   "dependencies": {
