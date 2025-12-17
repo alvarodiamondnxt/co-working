@@ -56,48 +56,78 @@ export async function createUser(email: string, password: string, name: string) 
 }
 
 export async function verifyCode(email: string, code: string) {
-  // Find valid verification code
-  const [verificationCode] = await sql`
-    SELECT vc.*, u.id as user_id, u.email as user_email, u.name as user_name
-    FROM "VerificationCode" vc
-    LEFT JOIN "User" u ON vc."userId" = u.id
-    WHERE vc.email = ${email}
-      AND vc.code = ${code}
-      AND vc.used = false
-      AND vc."expiresAt" > NOW()
-    ORDER BY vc."createdAt" DESC
-    LIMIT 1
-  `;
+  try {
+    console.log('🔍 Verifying code for email:', email, 'code:', code);
+    
+    // Find valid verification code
+    const [verificationCode] = await sql`
+      SELECT vc.*, u.id as user_id, u.email as user_email, u.name as user_name
+      FROM "VerificationCode" vc
+      LEFT JOIN "User" u ON vc."userId" = u.id
+      WHERE vc.email = ${email}
+        AND vc.code = ${code}
+        AND vc.used = false
+        AND vc."expiresAt" > NOW()
+      ORDER BY vc."createdAt" DESC
+      LIMIT 1
+    `;
 
-  if (!verificationCode) {
-    return null;
+    console.log('📋 Verification code query result:', verificationCode ? '✅ Found' : '❌ Not found');
+
+    if (!verificationCode) {
+      console.log('❌ No valid verification code found');
+      return null;
+    }
+
+    console.log('✅ Valid code found, marking as used...');
+
+    // Mark code as used
+    await sql`
+      UPDATE "VerificationCode"
+      SET used = true
+      WHERE id = ${verificationCode.id}
+    `;
+
+    console.log('✅ Code marked as used');
+
+    // Update user email as verified
+    await sql`
+      UPDATE "User"
+      SET "emailVerified" = NOW(), "updatedAt" = NOW()
+      WHERE id = ${verificationCode.user_id}
+    `;
+
+    console.log('✅ User email verified');
+
+    // Get updated user
+    const [user] = await sql`
+      SELECT id, email, name, "emailVerified", "createdAt", "updatedAt"
+      FROM "User"
+      WHERE id = ${verificationCode.user_id}
+    `;
+
+    if (!user) {
+      console.error('❌ User not found after verification');
+      return null;
+    }
+
+    console.log('✅ User found:', user.id);
+
+    // Send welcome email
+    await sendWelcomeEmail(user.email, user.name || 'User');
+
+    console.log('✅ Welcome email sent');
+
+    return user;
+  } catch (error: any) {
+    console.error('❌ Error in verifyCode:', error);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      detail: error.detail,
+    });
+    throw error;
   }
-
-  // Mark code as used
-  await sql`
-    UPDATE "VerificationCode"
-    SET used = true
-    WHERE id = ${verificationCode.id}
-  `;
-
-  // Update user email as verified
-  await sql`
-    UPDATE "User"
-    SET "emailVerified" = NOW(), "updatedAt" = NOW()
-    WHERE id = ${verificationCode.user_id}
-  `;
-
-  // Get updated user
-  const [user] = await sql`
-    SELECT id, email, name, "emailVerified", "createdAt", "updatedAt"
-    FROM "User"
-    WHERE id = ${verificationCode.user_id}
-  `;
-
-  // Send welcome email
-  await sendWelcomeEmail(user.email, user.name || 'User');
-
-  return user;
 }
 
 export async function loginUser(email: string, password: string) {
