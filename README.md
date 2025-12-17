@@ -16,7 +16,7 @@ A modern coworking space management application built with Next.js, featuring us
 ## Tech Stack
 
 - **Framework**: Next.js 16
-- **Database**: PostgreSQL with Prisma ORM
+- **Database**: Supabase (PostgreSQL) with Prisma ORM
 - **Authentication**: NextAuth.js with custom 2FA
 - **Email**: Nodemailer with Gmail
 - **Payments**: Stripe
@@ -27,7 +27,7 @@ A modern coworking space management application built with Next.js, featuring us
 ### Prerequisites
 
 - Node.js 18+ 
-- PostgreSQL database
+- Supabase account and project
 - Gmail account with App Password
 - Stripe account (for payments)
 
@@ -48,8 +48,13 @@ npm install
 Create a `.env` file in the root directory:
 
 ```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/coworking?schema=public"
+# Supabase Database
+# Get from Supabase Dashboard > Settings > Database > Connection string (Connection pooling mode)
+SUPABASE_URL="postgresql://postgres.bmnhvvnsdfpkgaumhmtp:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres"
+
+# Supabase Project
+SUPABASE_PROJECT_URL="https://bmnhvvnsdfpkgaumhmtp.supabase.co"
+SUPABASE_API_KEY="your-supabase-api-key"
 
 # NextAuth
 NEXTAUTH_URL="http://localhost:5000"
@@ -64,18 +69,28 @@ STRIPE_SECRET_KEY="sk_test_your_secret_key"
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_your_publishable_key"
 ```
 
-4. Generate NextAuth secret:
+4. Get your Supabase connection string:
+   - Go to your Supabase Dashboard: https://supabase.com/dashboard
+   - Select your project
+   - Go to Settings > Database
+   - Under "Connection string", select "Connection pooling" mode
+   - Copy the connection string and replace `[YOUR-PASSWORD]` with your database password
+   - Replace `[REGION]` with your Supabase region (e.g., `us-east-1`)
+   - Add it to `SUPABASE_URL` in `.env`
+   - Get your API key from Settings > API (anon/public key) and add to `SUPABASE_API_KEY`
+
+5. Generate NextAuth secret:
 ```bash
 openssl rand -base64 32
 ```
 
-5. Set up the database:
+6. Set up the database:
 ```bash
 npm run db:generate
 npm run db:push
 ```
 
-6. Run the development server:
+7. Run the development server:
 ```bash
 npm run dev
 ```
@@ -84,6 +99,7 @@ The application will be available at `http://localhost:5000`
 
 ## Documentation
 
+- [Supabase Setup](./SUPABASE_SETUP.md) - Complete Supabase configuration guide
 - [Environment Setup](./ENV_SETUP.md) - Detailed environment variable configuration
 - [Email Setup](./EMAIL_SETUP.md) - Email system configuration and troubleshooting
 - [Gmail App Password](./GMAIL_PASSWORD_FORMAT.md) - How to get and format Gmail app passwords

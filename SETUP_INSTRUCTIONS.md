@@ -7,8 +7,8 @@
    - Login with 2FA code
    - Welcome email on registration
 
-2. **PostgreSQL Database**
-   - Everything is saved in PostgreSQL (nothing in localStorage)
+2. **Supabase Database**
+   - Everything is saved in Supabase (PostgreSQL) - nothing in localStorage
    - Models: User, Session, VerificationCode, PaymentMethod, Booking
 
 3. **Stripe Payment Methods**
@@ -33,8 +33,13 @@
 Create a `.env` file in the project root:
 
 ```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/coworking?schema=public"
+# Supabase Database
+# Get the connection string from Supabase Dashboard > Settings > Database > Connection string
+SUPABASE_URL="postgresql://postgres.bmnhvvnsdfpkgaumhmtp:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres"
+
+# Supabase Project
+SUPABASE_PROJECT_URL="https://bmnhvvnsdfpkgaumhmtp.supabase.co"
+SUPABASE_API_KEY="your-supabase-api-key"
 
 # NextAuth
 NEXTAUTH_URL="http://localhost:5000"
@@ -60,16 +65,25 @@ openssl rand -base64 32
 3. App passwords
 4. Generate a new one for "Mail"
 
-### 2. Configure PostgreSQL Database
+### 2. Configure Supabase Database
 
-1. Create a PostgreSQL database:
-```sql
-CREATE DATABASE coworking;
-```
+1. Get your Supabase connection string:
+   - Go to your Supabase Dashboard: https://supabase.com/dashboard
+   - Select your project
+   - Go to Settings > Database
+   - Under "Connection string", select "Connection pooling" mode
+   - Copy the connection string (it should look like: `postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres`)
+   - Replace `[YOUR-PASSWORD]` with your database password
+   - Replace `[REGION]` with your Supabase region
 
-2. Update the `DATABASE_URL` in `.env`
+2. Update the `SUPABASE_URL` in `.env` with the connection string
 
-3. Run migrations:
+3. Get your Supabase API key:
+   - In Supabase Dashboard, go to Settings > API
+   - Copy the "anon" or "public" key
+   - Add it to `SUPABASE_API_KEY` in `.env`
+
+4. Run migrations to create tables:
 ```bash
 npm run db:push
 ```
@@ -158,7 +172,7 @@ prisma/
 
 ## 📝 Important Notes
 
-- **Everything is saved in PostgreSQL** - No localStorage is used
+- **Everything is saved in Supabase (PostgreSQL)** - No localStorage is used
 - Verification codes expire in 10 minutes
 - Codes can only be used once
 - Passwords are hashed with bcrypt
