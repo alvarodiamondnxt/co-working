@@ -7,6 +7,21 @@ if (!connectionString) {
   throw new Error('SUPABASE_URL environment variable is not set');
 }
 
+// Log connection info in development (without password)
+if (process.env.NODE_ENV === 'development') {
+  try {
+    const url = new URL(connectionString);
+    console.log('🔌 Database connection:', {
+      host: url.hostname,
+      port: url.port,
+      database: url.pathname.replace('/', ''),
+      user: url.username,
+    });
+  } catch (e) {
+    console.warn('⚠️ Could not parse connection string');
+  }
+}
+
 // Create a single connection pool
 // Using connection pooling for better performance
 const sql = postgres(connectionString, {

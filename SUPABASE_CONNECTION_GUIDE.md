@@ -2,11 +2,25 @@
 
 This guide will walk you through connecting your CoWorking application to Supabase using the provided connection string.
 
-## Your Connection String
+## ⚠️ IMPORTANT: Get the Correct Connection String
 
-```
-SUPABASE_URL=postgresql://postgres:Mattyykenet1@db.bmnhvvnsdfpkgaumhmtp.supabase.co:5432/postgres
-```
+**DO NOT use the format `db.bmnhvvnsdfpkgaumhmtp.supabase.co` - it may not work!**
+
+You MUST get the connection string directly from Supabase Dashboard:
+
+1. Go to https://supabase.com/dashboard
+2. Select your project
+3. Go to **Settings** > **Database**
+4. Scroll to **Connection string**
+5. Select **Connection pooling** mode (recommended)
+6. Copy the connection string - it should look like:
+   ```
+   postgresql://postgres.bmnhvvnsdfpkgaumhmtp:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true
+   ```
+7. Replace `[PASSWORD]` with your actual password
+8. Replace `[REGION]` with your region (e.g., `us-east-1`, `eu-central-1`)
+
+**The correct format uses `aws-0-[REGION].pooler.supabase.com`, NOT `db.bmnhvvnsdfpkgaumhmtp.supabase.co`**
 
 ## Step 1: Install Dependencies
 
