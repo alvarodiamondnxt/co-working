@@ -17,6 +17,12 @@ if (process.env.NODE_ENV === 'development') {
       database: url.pathname.replace('/', ''),
       user: url.username,
     });
+    
+    // Check if username format is correct
+    if (url.username === 'postgres' && !url.username.includes('.')) {
+      console.warn('⚠️ WARNING: Username should be "postgres.bmnhvvnsdfpkgaumhmtp", not just "postgres"');
+      console.warn('   Get the correct connection string from Supabase Dashboard > Settings > Database > Connection pooling');
+    }
   } catch (e) {
     console.warn('⚠️ Could not parse connection string');
   }
