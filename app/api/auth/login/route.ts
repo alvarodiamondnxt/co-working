@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loginUser } from "@/lib/auth";
+import { createSession } from "@/lib/session";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -21,10 +22,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if there's an error (like email not verified)
+    if ('error' in result) {
+      return NextResponse.json(
+        { error: result.error },
+        { status: 400 }
+      );
+    }
+
+    // Create session directly
+    await createSession(result.user.id);
+
     return NextResponse.json({
       success: true,
-      requires2FA: true,
-      message: "Verification code sent to your email",
+      message: "Login successful",
+      user: result.user,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

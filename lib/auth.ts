@@ -103,7 +103,7 @@ export async function verifyCode(email: string, code: string) {
 export async function loginUser(email: string, password: string) {
   // Find user by email
   const [user] = await sql`
-    SELECT id, email, name, password
+    SELECT id, email, name, password, "emailVerified"
     FROM "User"
     WHERE email = ${email}
     LIMIT 1
@@ -118,20 +118,13 @@ export async function loginUser(email: string, password: string) {
     return null;
   }
 
-  // Generate 2FA code
-  const code = await generateVerificationCode();
-  const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+  // Check if email is verified
+  if (!user.emailVerified) {
+    return { error: "Email not verified. Please verify your email first." };
+  }
 
-  const codeId = generateId();
-  await sql`
-    INSERT INTO "VerificationCode" (id, code, email, "userId", "expiresAt", used, "createdAt")
-    VALUES (${codeId}, ${code}, ${email}, ${user.id}, ${expiresAt}, false, NOW())
-  `;
-
-  await sendVerificationCode(email, code);
-
-  return { user: { id: user.id, email: user.email, name: user.name }, requires2FA: true };
+  // Return user directly - no 2FA needed for login
+  return { user: { id: user.id, email: user.email, name: user.name } };
 }
 
 export async function verifyLoginCode(email: string, code: string) {
