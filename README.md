@@ -69,28 +69,18 @@ STRIPE_SECRET_KEY="sk_test_your_secret_key"
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_your_publishable_key"
 ```
 
-4. Get your Supabase connection string:
-   - Go to your Supabase Dashboard: https://supabase.com/dashboard
-   - Select your project
-   - Go to Settings > Database
-   - Under "Connection string", select "Connection pooling" mode
-   - Copy the connection string and replace `[YOUR-PASSWORD]` with your database password
-   - Replace `[REGION]` with your Supabase region (e.g., `us-east-1`)
-   - Add it to `SUPABASE_URL` in `.env`
-   - Get your API key from Settings > API (anon/public key) and add to `SUPABASE_API_KEY`
+4. Set up Supabase:
+   - Add your connection string to `SUPABASE_URL` in `.env`
+   - Get your API key from Supabase Dashboard > Settings > API (anon/public key) and add to `SUPABASE_API_KEY`
+   - Run the SQL schema: Copy `database/schema.sql` and run it in Supabase SQL Editor
+   - See [SUPABASE_CONNECTION_GUIDE.md](./SUPABASE_CONNECTION_GUIDE.md) for detailed step-by-step instructions
 
 5. Generate NextAuth secret:
 ```bash
 openssl rand -base64 32
 ```
 
-6. Set up the database:
-```bash
-npm run db:generate
-npm run db:push
-```
-
-7. Run the development server:
+6. Run the development server:
 ```bash
 npm run dev
 ```
