@@ -56,6 +56,7 @@ export default function RegisterPage() {
 
       setStep("verify");
       setSuccess("Verification code sent to your email");
+      setLoading(false); // Reset loading when moving to verify step
     } catch (err) {
       setError("Connection error");
       setLoading(false);
@@ -197,62 +198,105 @@ export default function RegisterPage() {
             </button>
           </form>
         ) : (
-          <form onSubmit={handleVerifySubmit} className="space-y-6">
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">
-                Verification Code
-              </label>
-              <input
-                type="text"
-                required
-                maxLength={6}
-                value={code}
-                onChange={(e) => {
-                  const newCode = e.target.value.replace(/\D/g, "").slice(0, 6);
-                  setCode(newCode);
-                  setError("");
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && code.length === 6 && !loading) {
-                    e.preventDefault();
-                    handleVerifySubmit(e as any);
-                  }
-                }}
-                autoFocus
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-2xl tracking-widest"
-                placeholder="000000"
-              />
-              <p className="text-sm text-gray-500 mt-2">
-                Check your email: {formData.email}
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-4">
+                <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <p className="text-gray-600 mb-2">
+                We sent a verification code to
+              </p>
+              <p className="text-gray-900 font-semibold">
+                {formData.email}
               </p>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading || code.length !== 6}
-              className={`w-full py-3 rounded-lg font-bold transition-all ${
-                loading || code.length !== 6
-                  ? "bg-gray-400 text-white cursor-not-allowed opacity-50"
-                  : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
-              }`}
-            >
-              {loading ? "Verifying..." : "Verify"}
-            </button>
+            <form onSubmit={handleVerifySubmit} className="space-y-6">
+              <div>
+                <label className="block text-gray-700 font-semibold mb-3 text-center">
+                  Enter Verification Code
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  required
+                  maxLength={6}
+                  value={code}
+                  onChange={(e) => {
+                    const newCode = e.target.value.replace(/\D/g, "").slice(0, 6);
+                    setCode(newCode);
+                    setError("");
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && code.length === 6 && !loading) {
+                      e.preventDefault();
+                      handleVerifySubmit(e as any);
+                    }
+                  }}
+                  autoFocus
+                  className="w-full px-4 py-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-3xl tracking-[0.5em] font-mono font-bold"
+                  placeholder="000000"
+                  style={{ letterSpacing: '0.5em' }}
+                />
+                <div className="mt-3 text-center">
+                  <p className="text-sm text-gray-500">
+                    {code.length}/6 digits
+                  </p>
+                </div>
+              </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setStep("form");
-                setCode("");
-                setError("");
-                setSuccess("");
-              }}
-              disabled={loading}
-              className="w-full text-gray-600 py-2 hover:text-gray-900 disabled:opacity-50"
-            >
-              Back
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={loading || code.length !== 6}
+                className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform ${
+                  loading || code.length !== 6
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                }`}
+                onClick={(e) => {
+                  if (code.length === 6 && !loading) {
+                    handleVerifySubmit(e as any);
+                  }
+                }}
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Verifying...
+                  </span>
+                ) : (
+                  "Verify Email"
+                )}
+              </button>
+
+              {code.length !== 6 && (
+                <p className="text-sm text-center text-gray-500">
+                  Please enter all 6 digits to continue
+                </p>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setStep("form");
+                  setCode("");
+                  setError("");
+                  setSuccess("");
+                  setLoading(false);
+                }}
+                disabled={loading}
+                className="w-full text-gray-600 py-3 hover:text-gray-900 disabled:opacity-50 font-medium"
+              >
+                ← Back to registration
+              </button>
+            </form>
+          </div>
         )}
 
         <div className="mt-6 text-center">
