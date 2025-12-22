@@ -91,12 +91,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center px-4 py-12 md:py-20">
       <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl">CW</span>
-          </div>
+          <Link
+            href={`/${locale}`}
+            aria-label={t("common.home")}
+            className="inline-block"
+          >
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <span className="text-white font-bold text-2xl">GC</span>
+            </div>
+          </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("auth.loginTitle")}</h1>
           <p className="text-gray-600">
             {step === "email" 

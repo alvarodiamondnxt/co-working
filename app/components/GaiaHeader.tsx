@@ -1,0 +1,126 @@
+/* eslint-disable @next/next/no-img-element */
+"use client";
+
+import { useEffect, useState } from "react";
+
+type Props = {
+  basePath?: string;
+};
+
+const buildNavLinks = (basePath: string) => [
+  { label: "Preços", href: `${basePath}/precos` },
+  { label: "Espaços", href: `${basePath}#espacos` },
+  { label: "Day Pass", href: `${basePath}#day-pass` },
+  { label: "Escritório Virtual", href: `${basePath}#contacto` },
+  { label: "Contacto", href: `${basePath}#contacto` },
+];
+
+export default function GaiaHeader({ basePath = "" }: Props) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navLinks = buildNavLinks(basePath);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 1024) setMenuOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return (
+    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-black/5">
+      <div className="container mx-auto flex items-center justify-between px-5 py-4 lg:py-5">
+        <a href={`${basePath || "/"}`} className="flex items-center gap-3" aria-label="Voltar à página inicial">
+          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 shadow-soft flex items-center justify-center text-xl font-bold text-white">
+            GC
+          </div>
+          <span className="text-lg font-semibold tracking-tight">Gaia Coworking</span>
+        </a>
+
+        <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
+          {navLinks.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              className="hover:text-blue-600 transition-colors"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2 text-xs font-semibold rounded-full border border-black/10 px-3 py-1.5 bg-white shadow-soft">
+            <span className="px-1 text-blue-600">PT</span>
+            <span className="text-black/30">|</span>
+            <span className="px-1 text-black/60">EN</span>
+          </div>
+          <a
+            href={`${basePath}/login`.replace("//", "/")}
+            className="hidden sm:inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] shadow-soft hover:bg-[#F7F7F5] transition"
+          >
+            Login
+          </a>
+          <button
+            className="lg:hidden flex items-center justify-center rounded-full border border-black/10 bg-white h-10 w-10 shadow-soft cursor-pointer"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-expanded={menuOpen}
+            aria-label="Abrir menu"
+            type="button"
+          >
+            <svg className="h-5 w-5" viewBox="0 0 24 24" stroke="currentColor" fill="none" strokeWidth="2">
+              {menuOpen ? (
+                <path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" />
+              ) : (
+                <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+              )}
+            </svg>
+          </button>
+        </div>
+      </div>
+      {menuOpen && (
+        <div className="lg:hidden border-t border-black/5 bg-white/95 backdrop-blur-sm shadow-soft animate-dropdown">
+          <div className="container mx-auto px-5 py-4 space-y-4">
+            <div className="flex items-center gap-3 text-xs font-semibold rounded-full border border-black/10 px-3 py-1.5 bg-white shadow-soft w-fit">
+              <span className="px-1 text-blue-600">PT</span>
+              <span className="text-black/30">|</span>
+              <span className="px-1 text-black/60">EN</span>
+            </div>
+            <div className="grid gap-2">
+              {navLinks.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="flex items-center justify-between rounded-2xl bg-[#F7F7F5] px-4 py-3 text-sm font-semibold text-[#1A1A1A] shadow-soft"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {item.label}
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </a>
+              ))}
+            </div>
+            <div className="flex flex-col gap-2">
+              <a
+                href={`${basePath}/login`.replace("//", "/")}
+                className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-3 text-sm font-semibold text-[#1A1A1A] shadow-soft"
+                onClick={() => setMenuOpen(false)}
+              >
+                Login
+              </a>
+              <a
+                href={`${basePath}/#day-pass`.replace("//", "/")}
+                className="inline-flex items-center justify-center rounded-full border border-blue-600 px-4 py-3 text-sm font-semibold text-blue-700 shadow-soft"
+                onClick={() => setMenuOpen(false)}
+              >
+                Day Pass
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}
+

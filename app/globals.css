@@ -3,12 +3,18 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary-blue: #3b82f6;
+  --primary-purple: #9333ea;
+  --accent-blue: #2563eb;
+  --off-white: #f7f7f5;
+  --off-white-blue: #f0f4ff;
+  --charcoal: #1a1a1a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-poppins);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -19,5 +25,33 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
+}
+
+.shadow-soft {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+.blur-blob {
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border-radius: 9999px;
+  filter: blur(60px);
+}
+
+.animate-dropdown {
+  animation: dropdown 0.2s ease-out;
+  transform-origin: top center;
+}
+
+@keyframes dropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
